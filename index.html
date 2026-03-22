@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Ozawa</title>
+    
+    <!-- Elegant Japanese Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Lottie, Anime.js, and Confetti -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* --- THE ROOM BACKGROUND --- */
+        body, html {
+            font-family: 'Klee One', cursive, sans-serif; /* Swapped to Klee One */
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-color: #050505; 
+            color: #333;
+            transition: background-color 0.8s ease;
+        }
+        
+        .sender-name {
+            text-align: right;
+            margin-top: 40px; /* Gives some breathing room below the final paragraph */
+            font-size: 1.3rem; /* Slightly larger like a real signature */
+            font-weight: 600; /* Makes it stand out just a bit */
+            letter-spacing: 0.1em;
+            color: #111;
+        }
+
+        /* When lights turn on, the wallpaper becomes visible (dark cozy warm tone) */
+        body.lights-on {
+            background-color: #2b211e; 
+        }
+
+        /* When transitioning to the card, the background changes to a beautiful subtle pattern */
+        body.reading-letter {
+            background-color: #e5d9c5;
+            background-image: radial-gradient(#d4c3ab 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* --- ROOM ELEMENTS (Hidden in dark, visible when lights on) --- */
+        #room-elements {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; transition: opacity 0.8s ease;
+            pointer-events: none; z-index: 1;
+        }
+        body.lights-on #room-elements { opacity: 1; }
+
+        /* The Floor */
+        .floor {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 25vh;
+            background-color: #1a1412;
+            border-top: 5px solid #0f0b0a;
+        }
+
+        /* The Rug */
+        .rug {
+            position: absolute; bottom: 5vh; left: 50%; transform: translateX(-50%);
+            width: 350px; height: 120px;
+            background-color: #8c2a2a; /* Warm cozy red */
+            border-radius: 50%;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* The Couch */
+        .couch {
+            position: absolute; bottom: 20vh; left: 10%;
+            width: 220px; height: 120px;
+        }
+        .couch-base {
+            position: absolute; bottom: 0; width: 100%; height: 60px;
+            background: #34495e; border-radius: 10px;
+        }
+        .couch-back {
+            position: absolute; bottom: 40px; left: 10px; width: 200px; height: 80px;
+            background: #2c3e50; border-radius: 15px 15px 5px 5px;
+        }
+        .couch-arm-left, .couch-arm-right {
+            position: absolute; bottom: 0; width: 40px; height: 75px;
+            background: #22313f; border-radius: 10px;
+        }
+        .couch-arm-right { right: 0; }
+
+        /* The Ceiling Lamp */
+        .lamp-container {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .lamp-cord {
+            width: 4px; height: 10vh; background: #111;
+        }
+        .lamp-shade {
+            width: 80px; height: 40px; background: #d35400;
+            border-radius: 40px 40px 0 0;
+            position: relative;
+        }
+        .lamp-bulb {
+            position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+            width: 30px; height: 15px; background: #FFF2B2;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 5px 15px #FFF2B2;
+        }
+
+        /* --- THE SPOTLIGHT --- */
+        #spotlight {
+            position: absolute;
+            top: calc(10vh + 40px); /* Starts exactly under the lamp shade */
+            left: 50%; transform: translateX(-50%);
+            width: 450px; height: 90vh;
+            background: linear-gradient(to bottom, rgba(255, 242, 178, 0.5) 0%, rgba(255, 242, 178, 0.05) 80%, transparent 100%);
+            clip-path: polygon(35% 0, 65% 0, 100% 100%, 0% 100%);
+            opacity: 0; transition: opacity 0.5s ease-in; pointer-events: none; z-index: 2;
+        }
+        body.lights-on #spotlight { opacity: 1; }
+
+        /* --- INTRO SCENE WRAPPER --- */
+        #intro-scene {
+            height: 100vh; width: 100%; position: relative; z-index: 10;
+        }
+
+        /* The Custom Hand-Drawn Switch */
+#switch-container {
+    position: absolute; 
+    right: 3%; 
+    top: 3%; /* Moved up from 45% */
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    z-index: 20;
+}
+        .switch-plate {
+            width: 50px; height: 80px; background: #e0e0e0;
+            border: 3px solid #111; border-radius: 6px 8px 5px 7px;
+            position: relative; cursor: pointer;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.8); transition: transform 0.1s;
+        }
+        .switch-plate:active { transform: translateY(2px) translateX(2px); box-shadow: 2px 2px 0px rgba(0,0,0,0.8); }
+        .switch-toggle {
+            width: 20px; height: 35px; background: #ff4757; border: 2px solid #111;
+            border-radius: 4px; position: absolute; bottom: 10px; left: 12px;
+            transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: inset -2px -2px 0px rgba(0,0,0,0.2);
+        }
+        .switch-plate.is-on .switch-toggle { bottom: 30px; background: #2ed573; }
+
+        /* The 15-second Japanese Hint */
+        .switch-hint {
+            margin-top: 15px; font-size: 1rem; color: #fff;
+            opacity: 0; transition: opacity 1s ease;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        /* The Presentation Area (Stool + Gift) */
+        #presentation-area {
+            position: absolute; bottom: 10vh; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center;
+            opacity: 0; transition: opacity 1s ease 0.3s; z-index: 5;
+        }
+        body.lights-on #presentation-area { opacity: 1; }
+
+        #gift-box-wrapper {
+            cursor: pointer; transform: translateY(20px); transition: transform 0.2s; position: relative; z-index: 6;
+        }
+        #gift-box-wrapper:hover { transform: translateY(15px) scale(1.02); }
+
+        .sketch-stool {
+            width: 140px; height: 80px; position: relative; margin-top: -30px; z-index: 4;
+        }
+        .stool-top {
+            width: 100%; height: 25px; background: #8B4513; border: 3px solid #3e1f08;
+            border-radius: 50% / 20px; box-shadow: inset -5px -5px 0px rgba(0,0,0,0.5);
+        }
+        .stool-leg {
+            width: 10px; height: 60px; background: #A0522D; border: 2px solid #3e1f08;
+            position: absolute; top: 15px; border-radius: 3px;
+        }
+        .leg-left { left: 20px; transform: rotate(5deg); }
+        .leg-right { right: 20px; transform: rotate(-5deg); }
+
+body.reading-letter {
+            background-color: #f4eadd; /* Warm, unbleached silk color */
+            /* A subtle, elegant overlapping pattern */
+            background-image: 
+                linear-gradient(45deg, rgba(0,0,0,0.02) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.02) 75%, rgba(0,0,0,0.02)),
+                linear-gradient(45deg, rgba(0,0,0,0.02) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.02) 75%, rgba(0,0,0,0.02));
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+
+        #card-container { 
+            display: none; 
+            opacity: 0; 
+            width: 100%; 
+            max-width: 750px; 
+            margin: 0 auto; 
+            padding: 60px 20px; 
+            z-index: 10; 
+            position: relative; 
+        }
+
+        .paper-card {
+            background-color: #fffdfa;
+            /* Upgraded, slightly softer Washi texture */
+            background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            color: #181818; /* Darker charcoal for better readability */
+            border-radius: 8px;
+            padding: 70px 60px;
+            
+            /* The new elegant 3D drop shadow and subtle inner gold frame */
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 1px rgba(0,0,0,0.05),
+                inset 0 0 0 6px #fffdfa,
+                inset 0 0 0 7px rgba(212, 175, 55, 0.3); /* Subtle gold */
+            
+            line-height: 2.1; 
+            letter-spacing: 0.05em; 
+            position: relative;
+
+            /* Japanese Typography Enhancements */
+            text-align: justify; 
+            text-justify: inter-ideograph;
+            -webkit-font-smoothing: antialiased; /* Makes the font render perfectly smooth */
+        }
+
+        /* The Tape */
+        .paper-card::before {
+            content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+            width: 120px; height: 30px; background: rgba(255, 255, 255, 0.6); 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 2px;
+        }
+
+        .paper-card h1 { 
+            font-size: 1.8rem; 
+            margin-bottom: 45px; 
+            text-align: center; 
+            color: #111; 
+            border-bottom: 1px solid #eaeaea; 
+            padding-bottom: 25px; 
+            text-indent: 0; /* Keep the header perfectly centered */
+        }
+
+        .paper-card p { 
+            margin-bottom: 35px; /* A bit more breathing room between paragraphs */
+            font-size: 1.15rem; /* Slightly larger text */
+            text-indent: 1em; /* Traditional Japanese indent for the first line of every paragraph */
+        }
+
+        .signature-space { 
+            margin-top: 60px; 
+            padding-bottom: 20px; 
+            text-indent: 0 !important; /* Remove indent for the closing line */
+            text-align: right !important; /* Push the final greeting to the right */
+        }
+
+        @media (max-width: 768px) {
+            .paper-card { padding: 40px 25px; }
+            .paper-card h1 { font-size: 1.5rem; }
+            .paper-card p { font-size: 1rem; }
+#switch-container { 
+        right: 1%; 
+        top: 1%; 
+        transform: scale(0.8); 
+    }
+            .couch { display: none; /* Hide couch on small screens to avoid clutter */ }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Room Art -->
+    <div id="room-elements">
+        <div class="floor"></div>
+        <div class="rug"></div>
+        
+        <!-- Cozy CSS Couch -->
+        <div class="couch">
+            <div class="couch-back"></div>
+            <div class="couch-base"></div>
+            <div class="couch-arm-left"></div>
+            <div class="couch-arm-right"></div>
+        </div>
+
+        <!-- Hanging Lamp -->
+        <div class="lamp-container">
+            <div class="lamp-cord"></div>
+            <div class="lamp-shade">
+                <div class="lamp-bulb"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="spotlight"></div>
+
+    <!-- The Intro Scene -->
+    <div id="intro-scene">
+        
+        <!-- Switch -->
+        <div id="switch-container">
+            <div class="switch-plate" id="wall-switch">
+                <div class="switch-toggle"></div>
+            </div>
+            <div class="switch-hint">電気をつけてね</div> <!-- "Please turn on the light" -->
+        </div>
+
+        <!-- Presentation Area -->
+        <div id="presentation-area">
+            <div id="gift-box-wrapper" style="pointer-events: none;">
+                <!-- Notice: NO autoplay, NO loop -->
+                <lottie-player 
+                    id="gift-box"
+                    src="\animations\gift_box.json" 
+                    background="transparent" 
+                    speed="1" 
+                    style="width: 250px; height: 250px;">
+                </lottie-player>
+            </div>
+            
+            <div class="sketch-stool">
+                <div class="stool-leg leg-left"></div>
+                <div class="stool-leg leg-right"></div>
+                <div class="stool-top"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Paper Letter -->
+    <div id="card-container">
+        <div class="paper-card">
+            <h1>小沢、誕生日おめでとう！</h1>
+            <p>お正月に送ったメッセージを振り返ってみて、小沢の配信に出会えて本当に運が良かったなって改めて思ってるよ。でも正直なところ、最近小沢のことをもっとよく知れて、距離が縮まったことが何よりも一番嬉しいだ。</p>
+            <p>配信の時はいつもたくさんの元気をもらってるけど、配信外で話したり、小沢の頑張る姿を見たりして、さらに尊敬するようになったよ。本当に才能に溢れてると思う。</p>
+            <p>1月の時点ではまだ気づいてなかったけど、今では日々の会話が俺にとってすごく大切なものになってる。Botの設定を一緒に考えたり、お互いの生活について話したり、何気ない日常の出来事をシェアしたり…小沢と話すのが本当に楽しみなんだ。</p>
+            <p>話す回数は増えたけど、まだまだ小沢について知らないことがたくさんあると思う。でも、これまでに知った小沢の姿を見て、これからももっと深く知っていきたいって心から思ってるよ。今築き上げているこの絆を、本当に大切にしたい。</p>
+            <p>よく考えてみると、これってすごく不思議で素敵なことだよね。俺たちは地球の文字通り真裏に住んでいて、俺が月を見ている時、小沢は太陽を見ている。そっちが冬の時、こっちは夏だしね。育ってきた環境も、話す言葉も全く違うのに、こんなに分かり合えるんだから。こうやって日々の小さな出来事を共有することで、その距離がずっと近くに感じるよ。この1年は、俺が今作っているプロジェクトを見せたり、小沢がパンチくんの動画を見せてくれたり、お気に入りの曲を教えてくれたり、動画の素材のことで頼ってくれたり…そんな風に、お互いの世界を共有できる機会がもっと増えるといいな。</p>
+            <p>これからの1年、小沢の目標が全部叶うことを一番に願ってるけど、無理せず自分の体を大切にしてね。俺のサポートは、ただ配信を見るだけじゃないってこと、覚えておいてほしい。ストレスを感じた時や、愚痴を聞いてほしい時、ただ面白いことがあってシェアしたい時、いつでも俺が話を聞くからね。</p>
+            <p class="signature-space">俺を信頼してくれて、小沢の世界の一部にしてくれて、そして俺の日常を明るくしてくれて本当にありがとう。今日は好きなものをたくさん食べて、最高に素敵な誕生日を過ごしてね！</p>
+            <div class="sender-name">[Gaston]より</div>
+        </div>
+    </div>
+
+    <script>
+        const body = document.body;
+        const wallSwitch = document.getElementById('wall-switch');
+        const switchHint = document.querySelector('.switch-hint');
+        const giftBoxWrapper = document.getElementById('gift-box-wrapper');
+        const giftBoxLottie = document.getElementById('gift-box');
+        
+        let switchHasBeenClicked = false;
+
+        // 1. Hint logic (Shows up after 15 seconds ONLY if the switch hasn't been clicked)
+        setTimeout(() => {
+            if (!switchHasBeenClicked) {
+                switchHint.style.opacity = '1';
+            }
+        }, 15000);
+
+        // 2. Click the Switch
+        wallSwitch.addEventListener('click', function() {
+            switchHasBeenClicked = true;
+            switchHint.style.opacity = '0'; // Hide hint if it was showing
+            
+            this.classList.toggle('is-on');
+            
+            if(this.classList.contains('is-on')) {
+                body.classList.add('lights-on');
+                giftBoxWrapper.style.pointerEvents = 'auto'; 
+            } else {
+                body.classList.remove('lights-on');
+                giftBoxWrapper.style.pointerEvents = 'none'; 
+            }
+        });
+
+        // 3. Click the Gift Box
+        giftBoxWrapper.addEventListener('click', function() {
+            // Disable further clicks
+            this.style.pointerEvents = 'none';
+            
+            // Play the Lottie animation ONCE
+            giftBoxLottie.play();
+        });
+
+        // 4. Listen for the EXACT moment the Gift Box animation finishes
+        giftBoxLottie.addEventListener('complete', function() {
+            
+            // Fire Confetti!
+            var duration = 4 * 1000;
+            var end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 6, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff4757', '#fbc531', '#ffffff'] });
+                confetti({ particleCount: 6, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff4757', '#fbc531', '#ffffff'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+
+            // Transform the background and show the letter
+            body.classList.remove('lights-on');
+            body.classList.add('reading-letter');
+
+            anime({
+                targets: '#intro-scene, #room-elements, #spotlight',
+                opacity: [1, 0],
+                duration: 800,
+                easing: 'easeInOutQuad',
+                complete: function() {
+                    document.getElementById('intro-scene').style.display = 'none';
+                    document.getElementById('room-elements').style.display = 'none';
+                    document.getElementById('spotlight').style.display = 'none';
+                    
+                    const cardContainer = document.getElementById('card-container');
+                    cardContainer.style.display = 'block';
+                    
+                    anime({
+                        targets: '#card-container',
+                        opacity: [0, 1],
+                        translateY: [50, 0],
+                        duration: 1200,
+                        easing: 'easeOutCubic'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
