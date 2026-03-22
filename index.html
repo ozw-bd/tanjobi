@@ -33,6 +33,7 @@
             transition: background-color 0.8s ease;
         }
         
+        
         .sender-name {
             text-align: right;
             margin-top: 40px; /* Gives some breathing room below the final paragraph */
@@ -55,12 +56,16 @@
         }
 
         /* --- ROOM ELEMENTS (Hidden in dark, visible when lights on) --- */
-        #room-elements {
+#room-elements {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0; transition: opacity 0.8s ease;
+            opacity: 0; 
+            transition: opacity 0.4s ease; /* 1. Fades OFF smoothly */
             pointer-events: none; z-index: 1;
         }
-        body.lights-on #room-elements { opacity: 1; }
+        body.lights-on #room-elements { 
+            opacity: 1; 
+            transition: opacity 0.1s ease; /* 2. Snaps ON instantly */
+        }
 
         /* The Floor */
         .floor {
@@ -118,16 +123,21 @@
         }
 
         /* --- THE SPOTLIGHT --- */
-        #spotlight {
+#spotlight {
             position: absolute;
-            top: calc(10vh + 40px); /* Starts exactly under the lamp shade */
+            top: calc(10vh + 40px); 
             left: 50%; transform: translateX(-50%);
             width: 450px; height: 90vh;
             background: linear-gradient(to bottom, rgba(255, 242, 178, 0.5) 0%, rgba(255, 242, 178, 0.05) 80%, transparent 100%);
             clip-path: polygon(35% 0, 65% 0, 100% 100%, 0% 100%);
-            opacity: 0; transition: opacity 0.5s ease-in; pointer-events: none; z-index: 2;
+            opacity: 0; 
+            pointer-events: none; z-index: 2;
+            transition: opacity 0.4s ease; /* 1. Fades OFF smoothly */
         }
-        body.lights-on #spotlight { opacity: 1; }
+        body.lights-on #spotlight { 
+            opacity: 1; 
+            transition: opacity 0.1s ease; /* 2. Snaps ON instantly */
+        }
 
         /* --- INTRO SCENE WRAPPER --- */
         #intro-scene {
@@ -167,12 +177,17 @@
         }
 
         /* The Presentation Area (Stool + Gift) */
-        #presentation-area {
+#presentation-area {
             position: absolute; bottom: 10vh; left: 50%; transform: translateX(-50%);
             display: flex; flex-direction: column; align-items: center;
-            opacity: 0; transition: opacity 1s ease 0.3s; z-index: 5;
+            opacity: 0; 
+            z-index: 5;
+            transition: opacity 0.4s ease; /* 1. Fades OFF smoothly */
         }
-        body.lights-on #presentation-area { opacity: 1; }
+        body.lights-on #presentation-area { 
+            opacity: 1; 
+            transition: opacity 0.1s ease; /* 2. Snaps ON instantly */
+        }
 
         #gift-box-wrapper {
             cursor: pointer; transform: translateY(20px); transition: transform 0.2s; position: relative; z-index: 6;
